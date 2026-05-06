@@ -1,2 +1,15 @@
+# Secrets
 .env
 keys/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Coverage
+coverage/
+
+# Logs
+*.log
