@@ -1,1 +1,5 @@
 export * from './kafka/topics.js'
+export * from './schemas/webhook.schema.js'
+export * from './schemas/person.schema.js'
+export * from './schemas/account.schema.js'
+export * from './schemas/card.schema.js'
