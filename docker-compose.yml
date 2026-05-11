@@ -236,6 +236,30 @@ services:
       - streaming-service-1
       - streaming-service-2
 
+  # ─── Monitoring Dashboard ────────────────────────────────────────────────────
+
+  monitoring-dashboard:
+    build:
+      context: .
+      dockerfile: services/monitoring-dashboard/Dockerfile
+    container_name: monitoring-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - NODE_ENV=production
+    depends_on:
+      kafka:
+        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: '512m'
+
   # ─── Monitoring ───────────────────────────────────────────────────────────────
 
   prometheus:
