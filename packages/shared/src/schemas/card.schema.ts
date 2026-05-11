@@ -10,3 +10,6 @@ export const CardSchema = z.object({
 })
 
 export type Card = z.infer<typeof CardSchema>
+
+export const CardEventSchema = CardSchema.extend({ event_time: z.string() })
+export type CardEvent = z.infer<typeof CardEventSchema>

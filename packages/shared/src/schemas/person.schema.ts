@@ -12,3 +12,6 @@ export const PersonSchema = z.object({
 })
 
 export type Person = z.infer<typeof PersonSchema>
+
+export const PersonEventSchema = PersonSchema.extend({ event_time: z.string() })
+export type PersonEvent = z.infer<typeof PersonEventSchema>
