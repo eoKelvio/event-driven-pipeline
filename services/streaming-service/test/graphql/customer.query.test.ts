@@ -91,6 +91,14 @@ const CUSTOMER_QUERY = `
   }
 `
 
+describe('GET /metrics', () => {
+  it('retorna métricas Prometheus', async () => {
+    const response = await app.inject({ method: 'GET', url: '/metrics' })
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['content-type']).toMatch(/text\/plain/)
+  })
+})
+
 describe('GraphQL query: customer', () => {
   it('retorna dados do cliente quando encontrado', async () => {
     mockFindByCpf.mockResolvedValue(mockCustomer)
