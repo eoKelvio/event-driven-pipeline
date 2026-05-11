@@ -14,7 +14,7 @@ export default async function accountRoute(fastify: FastifyInstance) {
 
     await fastify.kafka.producer.send({
       topic: Topics.ACCOUNT_RAW,
-      messages: [{ key: String(payload.person_id), value: JSON.stringify(payload) }],
+      messages: [{ key: String(payload.person_id), value: JSON.stringify({ ...payload, event_time: envelope.time }) }],
     })
 
     fastify.metrics.eventsReceived.inc({ type: 'account', status: 'success' })

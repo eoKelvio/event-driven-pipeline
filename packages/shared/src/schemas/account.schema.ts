@@ -10,3 +10,6 @@ export const AccountSchema = z.object({
 })
 
 export type Account = z.infer<typeof AccountSchema>
+
+export const AccountEventSchema = AccountSchema.extend({ event_time: z.string() })
+export type AccountEvent = z.infer<typeof AccountEventSchema>
