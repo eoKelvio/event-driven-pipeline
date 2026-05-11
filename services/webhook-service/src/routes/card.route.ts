@@ -14,7 +14,7 @@ export default async function cardRoute(fastify: FastifyInstance) {
 
     await fastify.kafka.producer.send({
       topic: Topics.CARD_RAW,
-      messages: [{ key: String(payload.account_id), value: JSON.stringify(payload) }],
+      messages: [{ key: String(payload.account_id), value: JSON.stringify({ ...payload, event_time: envelope.time }) }],
     })
 
     fastify.metrics.eventsReceived.inc({ type: 'card', status: 'success' })
