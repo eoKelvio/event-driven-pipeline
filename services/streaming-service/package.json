@@ -13,8 +13,9 @@
   },
   "dependencies": {
     "@pipeline/shared": "*",
+    "@apollo/server": "^4.11.0",
+    "@as-integrations/fastify": "^2.1.1",
     "@pothos/core": "^3.41.0",
-    "apollo-server-fastify": "^3.13.0",
     "fastify": "^4.28.0",
     "fastify-plugin": "^4.5.1",
     "graphql": "^16.9.0",
