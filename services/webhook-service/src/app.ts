@@ -21,6 +21,8 @@ export async function buildApp() {
   await app.register(kafkaPlugin)
   await app.register(metricsPlugin)
 
+  app.get('/', async (_request, reply) => reply.send({ status: 'ok' }))
+
   await app.register(personRoute)
   await app.register(accountRoute)
   await app.register(cardRoute)

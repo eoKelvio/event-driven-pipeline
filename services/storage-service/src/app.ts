@@ -24,6 +24,8 @@ export async function buildApp() {
   await app.register(metricsPlugin)
   await app.register(consumersPlugin)
 
+  app.get('/', async (_request, reply) => reply.send({ status: 'ok' }))
+
   await app.register(personRoute)
   await app.register(accountRoute)
   await app.register(cardRoute)

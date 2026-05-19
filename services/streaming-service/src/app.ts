@@ -9,6 +9,8 @@ import metricsPlugin from './plugins/metrics.plugin.js'
 export async function buildApp() {
   const app = Fastify({ logger: true, pluginTimeout: 60000 })
 
+  app.get('/', async (_request, reply) => reply.send({ status: 'ok' }))
+
   await app.register(mongoPlugin)
   await app.register(kafkaPlugin)
   await app.register(postgresPlugin)
