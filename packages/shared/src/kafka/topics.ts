@@ -8,6 +8,7 @@ export const Topics = {
   CARD_STORED: 'events.card.stored',
 
   CONSOLIDATION_TRIGGER: 'triggers.consolidation',
+  CUSTOMER_STORED: 'events.customer.stored',
 } as const
 
 export type Topic = (typeof Topics)[keyof typeof Topics]
