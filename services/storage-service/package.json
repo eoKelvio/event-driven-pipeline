@@ -12,7 +12,9 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@fastify/swagger": "^9.7.0",
     "@pipeline/shared": "*",
+    "@scalar/fastify-api-reference": "^1.57.2",
     "drizzle-orm": "^0.31.0",
     "fastify": "^4.28.0",
     "fastify-plugin": "^4.5.1",
