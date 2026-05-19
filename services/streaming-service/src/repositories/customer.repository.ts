@@ -31,7 +31,7 @@ export async function upsertAccount(data: AccountEvent): Promise<void> {
   const result = await Customer.updateOne(
     { person_id: data.person_id },
     { $set: { 'accounts.$[elem]': accountData } },
-    { arrayFilters: [{ 'elem.account_id': data.account_id }] },
+    { arrayFilters: [{ 'elem.account_id': data.account_id }], timestamps: false },
   )
 
   if (result.modifiedCount === 0) {
@@ -56,6 +56,7 @@ export async function upsertCard(data: CardEvent): Promise<void> {
     { $set: { 'accounts.$[acc].cards.$[card]': cardData } },
     {
       arrayFilters: [{ 'acc.account_id': data.account_id }, { 'card.card_id': data.card_id }],
+      timestamps: false,
     },
   )
 
