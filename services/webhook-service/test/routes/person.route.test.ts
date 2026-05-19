@@ -29,12 +29,6 @@ const validPerson = {
   cpf: '12345678901',
 }
 
-const envelope = (payload: object) => ({
-  time: new Date().toISOString(),
-  body: 'encrypted',
-  event: 'person',
-})
-
 let app: FastifyInstance
 
 beforeAll(async () => {
@@ -54,17 +48,19 @@ describe('GET /metrics', () => {
 })
 
 describe('POST /person', () => {
-  it('retorna 202 e publica no Kafka quando o payload é válido', async () => {
+  it('retorna 202 com event e event_time quando o payload é válido', async () => {
     mockDecrypt.mockReturnValue(JSON.stringify(validPerson))
 
     const response = await app.inject({
       method: 'POST',
       url: '/person',
-      body: envelope(validPerson),
+      body: { body: 'encrypted' },
     })
 
     expect(response.statusCode).toBe(202)
-    expect(JSON.parse(response.body)).toEqual({ accepted: true })
+    const body = JSON.parse(response.body)
+    expect(body).toMatchObject({ accepted: true, event: 'person.received' })
+    expect(typeof body.event_time).toBe('string')
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({
         topic: 'events.person.raw',
@@ -79,7 +75,7 @@ describe('POST /person', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/person',
-      body: { time: new Date().toISOString() },
+      body: {},
     })
 
     expect(response.statusCode).toBe(400)
@@ -91,7 +87,7 @@ describe('POST /person', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/person',
-      body: envelope({}),
+      body: { body: 'encrypted' },
     })
 
     expect(response.statusCode).toBe(400)
@@ -104,7 +100,7 @@ describe('POST /person', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/person',
-      body: envelope(validPerson),
+      body: { body: 'encrypted' },
     })
 
     expect(response.statusCode).toBe(500)
