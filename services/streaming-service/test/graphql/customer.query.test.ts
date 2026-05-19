@@ -13,6 +13,11 @@ vi.mock('kafkajs', () => ({
       subscribe: vi.fn().mockResolvedValue(undefined),
       run: vi.fn().mockResolvedValue(undefined),
     }),
+    producer: vi.fn().mockReturnValue({
+      connect: vi.fn().mockResolvedValue(undefined),
+      disconnect: vi.fn().mockResolvedValue(undefined),
+      send: vi.fn().mockResolvedValue(undefined),
+    }),
   })),
 }))
 
@@ -21,6 +26,10 @@ vi.mock('mongoose', () => ({
     connect: vi.fn().mockResolvedValue(undefined),
     disconnect: vi.fn().mockResolvedValue(undefined),
   },
+}))
+
+vi.mock('../../src/models/customer.model.js', () => ({
+  Customer: { findOneAndUpdate: vi.fn().mockResolvedValue(undefined) },
 }))
 
 vi.mock('../../src/repositories/customer.repository.js', () => ({

@@ -4,7 +4,7 @@ export const person = pgTable('person', {
   personId: bigint('person_id', { mode: 'number' }).primaryKey(),
   cpf: varchar('cpf', { length: 11 }).unique().notNull(),
   name: text('name').notNull(),
-  email: text('email').notNull(),
+  email: text('email').unique().notNull(),
   gender: char('gender', { length: 1 }).notNull(),
   birthDate: date('birth_date').notNull(),
   address: text('address').notNull(),

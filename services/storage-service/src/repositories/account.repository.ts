@@ -1,7 +1,16 @@
-import { sql } from 'drizzle-orm'
+import { sql, eq } from 'drizzle-orm'
 import { account } from '../db/schema.js'
 import type { Database } from '../db/connection.js'
 import type { AccountEvent } from '@pipeline/shared'
+
+export async function getPersonIdByAccountId(db: Database, accountId: number): Promise<number | null> {
+  const result = await db
+    .select({ personId: account.personId })
+    .from(account)
+    .where(eq(account.accountId, accountId))
+    .limit(1)
+  return result[0]?.personId ?? null
+}
 
 export async function upsertAccount(db: Database, data: AccountEvent): Promise<void> {
   await db

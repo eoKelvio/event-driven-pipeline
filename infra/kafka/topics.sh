@@ -13,16 +13,17 @@ topics=(
   "events.account.stored"
   "events.card.stored"
   "triggers.consolidation"
+  "events.customer.stored"
 )
 
 echo "Waiting for Kafka at $BOOTSTRAP..."
-until kafka-topics.sh --bootstrap-server "$BOOTSTRAP" --list > /dev/null 2>&1; do
+until /opt/kafka/bin/kafka-topics.sh --bootstrap-server "$BOOTSTRAP" --list > /dev/null 2>&1; do
   sleep 2
 done
 echo "Kafka is ready."
 
 for topic in "${topics[@]}"; do
-  kafka-topics.sh --create \
+  /opt/kafka/bin/kafka-topics.sh --create \
     --if-not-exists \
     --bootstrap-server "$BOOTSTRAP" \
     --topic "$topic" \
