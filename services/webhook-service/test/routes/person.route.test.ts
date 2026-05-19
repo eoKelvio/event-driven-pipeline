@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import { FastifyInstance } from 'fastify'
 
-// mockSend precisa existir antes do vi.mock (hoisted resolve isso)
 const { mockSend } = vi.hoisted(() => ({ mockSend: vi.fn().mockResolvedValue(undefined) }))
 const { mockDecrypt } = vi.hoisted(() => ({ mockDecrypt: vi.fn() }))
 
@@ -46,6 +45,14 @@ afterAll(async () => {
   await app.close()
 })
 
+describe('GET /metrics', () => {
+  it('retorna métricas Prometheus', async () => {
+    const response = await app.inject({ method: 'GET', url: '/metrics' })
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['content-type']).toMatch(/text\/plain/)
+  })
+})
+
 describe('POST /person', () => {
   it('retorna 202 e publica no Kafka quando o payload é válido', async () => {
     mockDecrypt.mockReturnValue(JSON.stringify(validPerson))
@@ -72,7 +79,7 @@ describe('POST /person', () => {
     const response = await app.inject({
       method: 'POST',
       url: '/person',
-      body: { time: new Date().toISOString() }, // faltam body e event
+      body: { time: new Date().toISOString() },
     })
 
     expect(response.statusCode).toBe(400)
@@ -88,5 +95,19 @@ describe('POST /person', () => {
     })
 
     expect(response.statusCode).toBe(400)
+  })
+
+  it('retorna 500 quando o Kafka lança um erro inesperado', async () => {
+    mockDecrypt.mockReturnValue(JSON.stringify(validPerson))
+    mockSend.mockRejectedValueOnce(new Error('kafka unavailable'))
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/person',
+      body: envelope(validPerson),
+    })
+
+    expect(response.statusCode).toBe(500)
+    expect(JSON.parse(response.body)).toEqual({ error: 'Internal Server Error' })
   })
 })
