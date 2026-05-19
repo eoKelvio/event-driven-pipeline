@@ -18,6 +18,6 @@ export default fp(async (fastify: FastifyInstance) => {
   })
 
   await fastify.register(fastifyApiReference, {
-    routePrefix: '/reference',
+    routePrefix: '/docs',
   })
 })
