@@ -44,6 +44,14 @@ let app: FastifyInstance
 beforeAll(async () => { app = await buildApp() })
 afterAll(async () => { await app.close() })
 
+describe('GET /metrics', () => {
+  it('retorna métricas Prometheus', async () => {
+    const response = await app.inject({ method: 'GET', url: '/metrics' })
+    expect(response.statusCode).toBe(200)
+    expect(response.headers['content-type']).toMatch(/text\/plain/)
+  })
+})
+
 describe('POST /person', () => {
   it('retorna 201 e chama upsert e Kafka quando o payload é válido', async () => {
     const response = await app.inject({ method: 'POST', url: '/person', body: validPerson })
@@ -69,5 +77,14 @@ describe('POST /person', () => {
     const { event_time, ...withoutTime } = validPerson
     const response = await app.inject({ method: 'POST', url: '/person', body: withoutTime })
     expect(response.statusCode).toBe(400)
+  })
+
+  it('retorna 500 quando o upsert lança um erro inesperado', async () => {
+    mockUpsert.mockRejectedValueOnce(new Error('db unavailable'))
+
+    const response = await app.inject({ method: 'POST', url: '/person', body: validPerson })
+
+    expect(response.statusCode).toBe(500)
+    expect(JSON.parse(response.body)).toEqual({ error: 'Internal Server Error' })
   })
 })
