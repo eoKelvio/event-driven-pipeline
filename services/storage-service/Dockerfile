@@ -1,7 +1,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json tsconfig.json ./
 COPY packages/shared/package.json ./packages/shared/
 COPY services/storage-service/package.json ./services/storage-service/
 RUN npm ci
