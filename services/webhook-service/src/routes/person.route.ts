@@ -4,11 +4,9 @@ import { decrypt } from '../crypto/rsa.js'
 
 const envelopeBody = {
   type: 'object',
-  required: ['time', 'body', 'event'],
+  required: ['body'],
   properties: {
-    time: { type: 'string', format: 'date-time', description: 'Event timestamp' },
-    body: { type: 'string', description: 'RSA-OAEP encrypted payload (base64)' },
-    event: { type: 'string', description: 'Event type identifier' },
+    body: { type: 'string', description: 'RSA-OAEP encrypted payload (base64). Use POST /dev/encrypt/person to generate.' },
   },
 } as const
 
@@ -22,7 +20,11 @@ export default async function personRoute(fastify: FastifyInstance) {
         202: {
           description: 'Event accepted',
           type: 'object',
-          properties: { accepted: { type: 'boolean' } },
+          properties: {
+            accepted: { type: 'boolean' },
+            event: { type: 'string' },
+            event_time: { type: 'string', format: 'date-time' },
+          },
         },
       },
     },
@@ -34,13 +36,14 @@ export default async function personRoute(fastify: FastifyInstance) {
     endTimer()
 
     const payload = PersonSchema.parse(JSON.parse(decryptedBody))
+    const event_time = new Date().toISOString()
 
     await fastify.kafka.producer.send({
       topic: Topics.PERSON_RAW,
-      messages: [{ key: payload.cpf, value: JSON.stringify({ ...payload, event_time: envelope.time }) }],
+      messages: [{ key: payload.cpf, value: JSON.stringify({ ...payload, event_time }) }],
     })
 
     fastify.metrics.eventsReceived.inc({ type: 'person', status: 'success' })
-    return reply.status(202).send({ accepted: true })
+    return reply.status(202).send({ accepted: true, event: 'person.received', event_time })
   })
 }

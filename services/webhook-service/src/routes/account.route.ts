@@ -4,11 +4,9 @@ import { decrypt } from '../crypto/rsa.js'
 
 const envelopeBody = {
   type: 'object',
-  required: ['time', 'body', 'event'],
+  required: ['body'],
   properties: {
-    time: { type: 'string', format: 'date-time', description: 'Event timestamp' },
-    body: { type: 'string', description: 'RSA-OAEP encrypted payload (base64)' },
-    event: { type: 'string', description: 'Event type identifier' },
+    body: { type: 'string', description: 'RSA-OAEP encrypted payload (base64). Use POST /dev/encrypt/account to generate.' },
   },
 } as const
 
@@ -22,7 +20,11 @@ export default async function accountRoute(fastify: FastifyInstance) {
         202: {
           description: 'Event accepted',
           type: 'object',
-          properties: { accepted: { type: 'boolean' } },
+          properties: {
+            accepted: { type: 'boolean' },
+            event: { type: 'string' },
+            event_time: { type: 'string', format: 'date-time' },
+          },
         },
       },
     },
@@ -34,13 +36,14 @@ export default async function accountRoute(fastify: FastifyInstance) {
     endTimer()
 
     const payload = AccountSchema.parse(JSON.parse(decryptedBody))
+    const event_time = new Date().toISOString()
 
     await fastify.kafka.producer.send({
       topic: Topics.ACCOUNT_RAW,
-      messages: [{ key: String(payload.person_id), value: JSON.stringify({ ...payload, event_time: envelope.time }) }],
+      messages: [{ key: String(payload.person_id), value: JSON.stringify({ ...payload, event_time }) }],
     })
 
     fastify.metrics.eventsReceived.inc({ type: 'account', status: 'success' })
-    return reply.status(202).send({ accepted: true })
+    return reply.status(202).send({ accepted: true, event: 'account.received', event_time })
   })
 }
