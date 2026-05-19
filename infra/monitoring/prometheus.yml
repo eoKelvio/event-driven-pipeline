@@ -1,0 +1,24 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Services will be added here as they are implemented
+  - job_name: 'webhook-service'
+    static_configs:
+      - targets: ['webhook-service-1:9999', 'webhook-service-2:9999']
+    metrics_path: '/metrics'
+
+  - job_name: 'storage-service'
+    static_configs:
+      - targets: ['storage-service-1:9998', 'storage-service-2:9998']
+    metrics_path: '/metrics'
+
+  - job_name: 'streaming-service'
+    static_configs:
+      - targets: ['streaming-service-1:9997', 'streaming-service-2:9997']
+    metrics_path: '/metrics'

@@ -1,0 +1,228 @@
+{
+  "info": {
+    "name": "Event-Driven Pipeline",
+    "description": "Collection para testar todos os serviços do pipeline.\n\n**Webhook Service — Events**: o campo `body` deve ser um payload RSA-OAEP criptografado em base64. Use os endpoints da pasta **Dev** para gerar o valor criptografado, copie o campo `encrypted` da resposta e cole no campo `body` do endpoint desejado.\n\n**Webhook Service — Dev**: endpoints de utilitário local para criptografar payloads de cada entidade com os campos já pré-preenchidos.\n\n**Storage Service**: JSON direto, sem criptografia.\n\n**Streaming Service**: API GraphQL.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_webhook", "value": "http://localhost:9999" },
+    { "key": "base_storage", "value": "http://localhost:9998" },
+    { "key": "base_streaming", "value": "http://localhost:9997" }
+  ],
+  "item": [
+    {
+      "name": "Webhook Service",
+      "description": "Use a pasta Dev para gerar o payload criptografado, copie o campo `encrypted` e cole no campo `body`.",
+      "item": [
+        {
+          "name": "Dev",
+          "description": "Endpoints de utilitário para criptografar payloads localmente. Execute, copie o campo `encrypted` da resposta e cole no campo `body` do endpoint de ingestão correspondente.",
+          "item": [
+            {
+              "name": "POST /dev/encrypt/person",
+              "request": {
+                "method": "POST",
+                "url": "{{base_webhook}}/dev/encrypt/person",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"person_id\": 1,\n  \"name\": \"João Silva\",\n  \"email\": \"joao@example.com\",\n  \"gender\": \"M\",\n  \"birth_date\": \"1990/01/15\",\n  \"address\": \"Rua das Flores, 123\",\n  \"salary\": 5000.00,\n  \"cpf\": \"12345678900\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                }
+              }
+            },
+            {
+              "name": "POST /dev/encrypt/account",
+              "request": {
+                "method": "POST",
+                "url": "{{base_webhook}}/dev/encrypt/account",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"account_id\": 1,\n  \"status_id\": 1,\n  \"due_day\": 10,\n  \"person_id\": 1,\n  \"balance\": 1000.00,\n  \"available_balance\": 800.00\n}",
+                  "options": { "raw": { "language": "json" } }
+                }
+              }
+            },
+            {
+              "name": "POST /dev/encrypt/card",
+              "request": {
+                "method": "POST",
+                "url": "{{base_webhook}}/dev/encrypt/card",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"card_id\": 1,\n  \"card_number\": \"1234567890123456\",\n  \"account_id\": 1,\n  \"status_id\": 1,\n  \"limit\": 5000.00,\n  \"expiration_date\": \"12/2028\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                }
+              }
+            },
+            {
+              "name": "POST /dev/encrypt (genérico)",
+              "request": {
+                "method": "POST",
+                "url": "{{base_webhook}}/dev/encrypt",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{}",
+                  "options": { "raw": { "language": "json" } }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /person",
+          "request": {
+            "method": "POST",
+            "url": "{{base_webhook}}/person",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "description": "Cole no campo `body` o valor `encrypted` retornado por **POST {{base_webhook}}/dev/encrypt/person**.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "POST /account",
+          "request": {
+            "method": "POST",
+            "url": "{{base_webhook}}/account",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "description": "Cole no campo `body` o valor `encrypted` retornado por **POST {{base_webhook}}/dev/encrypt/account**.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "POST /card",
+          "request": {
+            "method": "POST",
+            "url": "{{base_webhook}}/card",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "description": "Cole no campo `body` o valor `encrypted` retornado por **POST {{base_webhook}}/dev/encrypt/card**.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Storage Service",
+      "item": [
+        {
+          "name": "POST /person",
+          "request": {
+            "method": "POST",
+            "url": "{{base_storage}}/person",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"person_id\": 1,\n  \"name\": \"João Silva\",\n  \"email\": \"joao.silva@example.com\",\n  \"gender\": \"M\",\n  \"birth_date\": \"1990/01/15\",\n  \"address\": \"Rua das Flores, 123, São Paulo - SP\",\n  \"salary\": 7500.00,\n  \"cpf\": \"12345678901\",\n  \"event_time\": \"2026-05-19T00:00:00.000Z\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "POST /account",
+          "request": {
+            "method": "POST",
+            "url": "{{base_storage}}/account",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account_id\": 101,\n  \"status_id\": 1,\n  \"due_day\": 10,\n  \"person_id\": 1,\n  \"balance\": 0.00,\n  \"available_balance\": 5000.00,\n  \"event_time\": \"2026-05-19T00:00:00.000Z\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "POST /card",
+          "request": {
+            "method": "POST",
+            "url": "{{base_storage}}/card",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"card_id\": 1001,\n  \"card_number\": \"4111111111111111\",\n  \"account_id\": 101,\n  \"status_id\": 1,\n  \"limit\": 3000.00,\n  \"expiration_date\": \"12/2028\",\n  \"event_time\": \"2026-05-19T00:00:00.000Z\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Streaming Service",
+      "item": [
+        {
+          "name": "Query customer by CPF",
+          "request": {
+            "method": "POST",
+            "url": "{{base_streaming}}/graphql",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetCustomer($cpf: String!) {\n  customer(cpf: $cpf) {\n    person_id\n    cpf\n    name\n    email\n    gender\n    birth_date\n    address\n    salary\n    accounts {\n      account_id\n      status_id\n      due_day\n      balance\n      available_balance\n      cards {\n        card_id\n        card_number\n        status_id\n        limit\n        expiration_date\n      }\n    }\n  }\n}",
+                "variables": "{\n  \"cpf\": \"12345678900\"\n}"
+              }
+            }
+          }
+        },
+        {
+          "name": "Query customer (sem accounts)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_streaming}}/graphql",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query GetCustomer($cpf: String!) {\n  customer(cpf: $cpf) {\n    person_id\n    cpf\n    name\n    email\n    gender\n    birth_date\n    address\n    salary\n  }\n}",
+                "variables": "{\n  \"cpf\": \"12345678900\"\n}"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "item": [
+        {
+          "name": "GET /metrics — Webhook",
+          "request": {
+            "method": "GET",
+            "url": "{{base_webhook}}/metrics",
+            "header": []
+          }
+        },
+        {
+          "name": "GET /metrics — Storage",
+          "request": {
+            "method": "GET",
+            "url": "{{base_storage}}/metrics",
+            "header": []
+          }
+        },
+        {
+          "name": "GET /metrics — Streaming",
+          "request": {
+            "method": "GET",
+            "url": "{{base_streaming}}/metrics",
+            "header": []
+          }
+        }
+      ]
+    }
+  ]
+}
