@@ -1,6 +1,6 @@
 # Event-Driven Pipeline
 
-A real-time event-driven microservices pipeline built with TypeScript, Kafka, GraphQL, and WebSocket. The system ingests encrypted webhook events, persists them in PostgreSQL, consolidates the full customer hierarchy into MongoDB, and streams every step to a live monitoring dashboard — all services communicating exclusively through asynchronous messaging.
+A real-time event-driven microservices pipeline built with TypeScript, Kafka, GraphQL, and WebSocket. The system ingests encrypted webhook events, persists them in PostgreSQL, consolidates the full customer hierarchy into MongoDB, and streams every step to a live monitoring dashboard. All services communicate exclusively through asynchronous messaging.
 
 > This project is an implementation of [challenge.md](./challenge.md). See [Adaptations from the original challenge](#adaptations-from-the-original-challenge) for what was extended and why.
 
@@ -46,7 +46,7 @@ Each of the three backend services runs as **2 replicas** behind an **Nginx load
 
 ## Services
 
-### Webhook Service — `:9999`
+### Webhook Service (:9999)
 
 Receives RSA-encrypted webhook events, decrypts the payload, validates it with Zod, and publishes it to Kafka.
 
@@ -109,13 +109,13 @@ All ingestion endpoints accept the same envelope:
 
 ---
 
-### Storage Service — `:9998`
+### Storage Service (:9998)
 
-Consumes raw Kafka events and persists them in PostgreSQL. Every upsert includes an **event-time ordering guard** — a record is only updated when the incoming event is newer than what is already stored, ensuring correctness regardless of delivery order.
+Consumes raw Kafka events and persists them in PostgreSQL. Every upsert includes an **event-time ordering guard**: a record is only updated when the incoming event is newer than what is already stored, ensuring correctness regardless of delivery order.
 
 After each successful write the service emits two Kafka messages:
-- `events.{entity}.stored` — confirmation that the entity was persisted
-- `triggers.consolidation` — instructs the streaming service to re-consolidate the customer
+- `events.{entity}.stored`: confirmation that the entity was persisted
+- `triggers.consolidation`: instructs the streaming service to re-consolidate the customer
 
 | Method | Path | Description |
 |--------|------|-------------|
@@ -127,7 +127,7 @@ After each successful write the service emits two Kafka messages:
 
 ---
 
-### Streaming Service — `:9997`
+### Streaming Service (:9997)
 
 Consumes `triggers.consolidation` from Kafka. On each trigger it queries the full customer state from PostgreSQL (person + accounts + cards via LEFT JOIN), builds the hierarchical document, and upserts it into MongoDB. After each successful upsert it emits `events.customer.stored`, closing the observability loop.
 
@@ -193,7 +193,7 @@ query {
 
 ---
 
-### Monitoring Dashboard — `:3000`
+### Monitoring Dashboard (:3000)
 
 A Next.js 15 application that subscribes to all Kafka topics and streams every pipeline event to the browser via Socket.io WebSocket. Displays a real-time event feed and per-entity storage counters.
 
@@ -210,11 +210,11 @@ A Next.js 15 application that subscribes to all Kafka topics and streams every p
 
 | Layer | Technology |
 |-------|-----------|
-| Language | TypeScript — Node.js 22 |
+| Language | TypeScript / Node.js 22 |
 | HTTP Framework | Fastify |
-| Messaging | Apache Kafka (KRaft, no ZooKeeper) — KafkaJS |
-| SQL Database | PostgreSQL 16 — Drizzle ORM |
-| NoSQL Database | MongoDB 7 — Mongoose |
+| Messaging | Apache Kafka (KRaft, no ZooKeeper) / KafkaJS |
+| SQL Database | PostgreSQL 16 / Drizzle ORM |
+| NoSQL Database | MongoDB 7 / Mongoose |
 | GraphQL | Apollo Server 4 + Pothos schema builder |
 | Real-time | Socket.io |
 | Frontend | Next.js 15 (App Router) |
@@ -238,7 +238,7 @@ A Next.js 15 application that subscribes to all Kafka topics and streams every p
 | `triggers.consolidation` | `person_id` | Storage → Streaming |
 | `events.customer.stored` | `person_id` | Streaming → Monitoring |
 
-Partition keys guarantee ordering — all events for the same entity land on the same partition.
+Partition keys guarantee ordering: all events for the same entity land on the same partition.
 
 ---
 
@@ -302,7 +302,7 @@ docker compose up --build
 
 ### 4. Send test events
 
-The scripts under `scripts/` generate encrypted payloads ready to be sent via `POST /dev/encrypt` or directly to the webhook.
+The scripts under `scripts/` generate encrypted payloads ready to be posted to the webhook.
 
 ```bash
 # Generate a linked person + account + card
@@ -337,7 +337,7 @@ cd services/streaming-service && npx vitest run --coverage
 cd services/monitoring-dashboard && npx vitest run --coverage
 ```
 
-All tests use mocks — no running infrastructure is required.
+All tests use mocks, so no running infrastructure is required.
 
 ---
 
@@ -350,22 +350,21 @@ All tests use mocks — no running infrastructure is required.
 - Streaming consolidation duration
 - Total events stored per entity
 
-**Monitoring Dashboard** (`http://localhost:3000`) provides a real-time view of every Kafka event as it flows through the pipeline, with per-entity storage counters updated live via WebSocket.
+**Monitoring Dashboard** (`http://localhost:3000`) provides a real-time view of every Kafka event as it flows through the pipeline, with per-entity counters updated live via WebSocket.
 
 ---
 
 ## Adaptations from the Original Challenge
 
-The original requirements are preserved in [CHALLENGE.md](./CHALLENGE.md). The following changes were made to reflect technical learning and production-closer patterns:
+The original requirements are preserved in [challenge.md](./challenge.md). The following changes were made to reflect technical learning and production-closer patterns:
 
 | Area | Original requirement | What was implemented |
 |------|----------------------|----------------------|
-| **Streaming service API** | 3 REST endpoints (suggested) | GraphQL API with Apollo Server 4 + Pothos — more flexible for product consumption |
-| **Monitoring** | "a monitoring panel" (tool of choice) | Full Next.js 15 service with Socket.io WebSocket streaming every Kafka event to the browser in real time |
-| **Consolidation flow** | Trigger → fetch SQL → store NoSQL | Explicit `triggers.consolidation` topic + `events.customer.stored` confirmation, creating a full observability loop |
-| **Event ordering** | "respect event order" | `event_time` guard on all upserts — record updated only if incoming event is newer than stored |
-| **FK constraints** | Implied relational integrity | Removed FK constraints to allow out-of-order event processing; consolidation JOIN handles incomplete state gracefully |
-| **Distributed tracing** | Not required | Jaeger was initially scoped but removed — no service was instrumented and it added infra overhead without value |
-| **Test coverage** | ≥ 80% | 100% across all 4 services — comprehensive unit tests with mocks, no running infrastructure needed |
-| **Integration tests** | Not required | Not implemented — unit test coverage with mocks was prioritised and achieved 100% |
-
+| **Streaming service API** | 3 REST endpoints (suggested) | GraphQL API with Apollo Server 4 + Pothos, more flexible for product consumption |
+| **Monitoring** | "a monitoring panel" (tool of choice) | Full Next.js 15 service with Socket.io streaming every Kafka event to the browser in real time |
+| **Consolidation flow** | Trigger → fetch SQL → store NoSQL | Explicit `triggers.consolidation` topic + `events.customer.stored` confirmation for a full observability loop |
+| **Event ordering** | "respect event order" | `event_time` guard on all upserts, a record is only updated if the incoming event is newer than what is stored |
+| **FK constraints** | Implied relational integrity | Removed to allow out-of-order event processing; the consolidation JOIN handles incomplete state gracefully |
+| **Distributed tracing** | Not required | Jaeger was initially scoped but removed, no service was instrumented and it added overhead without value |
+| **Test coverage** | >= 80% | 100% across all 4 services with comprehensive unit tests using mocks |
+| **Integration tests** | Not required | Not implemented, unit coverage with mocks was prioritised and reached 100% |
