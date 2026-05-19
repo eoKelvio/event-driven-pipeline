@@ -15,8 +15,12 @@ export async function startKafkaBridge(io: Server) {
 
   await consumer.connect()
   await consumer.subscribe({
-    topics: [Topics.PERSON_STORED, Topics.ACCOUNT_STORED, Topics.CARD_STORED],
+    topics: [Topics.PERSON_STORED, Topics.ACCOUNT_STORED, Topics.CARD_STORED, Topics.CUSTOMER_STORED],
     fromBeginning: false,
+  })
+
+  consumer.on(consumer.events.CRASH, () => {
+    process.exit(1)
   })
 
   await consumer.run({

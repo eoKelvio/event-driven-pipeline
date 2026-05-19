@@ -1,8 +1,8 @@
 'use client'
 
-import { useEventStream } from '../hooks/useEventStream.js'
-import { PipelineFlow } from '../components/PipelineFlow.js'
-import { EventFeed } from '../components/EventFeed.js'
+import { useEventStream } from '../hooks/useEventStream'
+import { PipelineFlow } from '../components/PipelineFlow'
+import { EventFeed } from '../components/EventFeed'
 
 export default function Dashboard() {
   const { events, counts, connected } = useEventStream()

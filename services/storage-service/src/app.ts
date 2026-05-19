@@ -9,7 +9,7 @@ import accountRoute from './routes/account.route.js'
 import cardRoute from './routes/card.route.js'
 
 export async function buildApp() {
-  const app = Fastify({ logger: true })
+  const app = Fastify({ logger: true, pluginTimeout: 60000 })
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
@@ -23,6 +23,8 @@ export async function buildApp() {
   await app.register(kafkaPlugin)
   await app.register(metricsPlugin)
   await app.register(consumersPlugin)
+
+  app.get('/', async (_request, reply) => reply.send({ status: 'ok' }))
 
   await app.register(personRoute)
   await app.register(accountRoute)
