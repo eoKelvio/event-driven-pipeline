@@ -6,17 +6,18 @@ import type { PipelineEvent } from '../lib/kafka-bridge.js'
 
 export type { PipelineEvent }
 
-export type EventCounts = { person: number; account: number; card: number }
+export type EventCounts = { person: number; account: number; card: number; consolidation: number }
 
 const TOPIC_TYPE: Record<string, keyof EventCounts> = {
   'events.person.stored': 'person',
   'events.account.stored': 'account',
   'events.card.stored': 'card',
+  'events.customer.stored': 'consolidation',
 }
 
 export function useEventStream() {
   const [events, setEvents] = useState<PipelineEvent[]>([])
-  const [counts, setCounts] = useState<EventCounts>({ person: 0, account: 0, card: 0 })
+  const [counts, setCounts] = useState<EventCounts>({ person: 0, account: 0, card: 0, consolidation: 0 })
   const [connected, setConnected] = useState(false)
 
   useEffect(() => {

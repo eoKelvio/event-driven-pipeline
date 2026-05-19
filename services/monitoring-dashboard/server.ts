@@ -13,8 +13,8 @@ await app.prepare()
 const httpServer = createServer(handler)
 const io = new Server(httpServer)
 
-await startKafkaBridge(io)
-
 httpServer.listen(config.port, () => {
   console.log(`Monitoring dashboard running on http://localhost:${config.port}`)
 })
+
+startKafkaBridge(io)
