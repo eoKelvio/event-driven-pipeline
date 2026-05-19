@@ -5,6 +5,7 @@ import metricsPlugin from './plugins/metrics.plugin.js'
 import personRoute from './routes/person.route.js'
 import accountRoute from './routes/account.route.js'
 import cardRoute from './routes/card.route.js'
+import devRoute from './routes/dev.route.js'
 
 export async function buildApp() {
   const app = Fastify({ logger: true })
@@ -23,6 +24,7 @@ export async function buildApp() {
   await app.register(personRoute)
   await app.register(accountRoute)
   await app.register(cardRoute)
+  await app.register(devRoute)
 
   return app
 }
