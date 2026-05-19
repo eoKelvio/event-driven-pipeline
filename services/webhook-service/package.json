@@ -12,7 +12,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@fastify/swagger": "^9.7.0",
+    "@fastify/swagger": "^8.15.0",
     "@pipeline/shared": "*",
     "@scalar/fastify-api-reference": "^1.57.2",
     "fastify": "^4.28.0",

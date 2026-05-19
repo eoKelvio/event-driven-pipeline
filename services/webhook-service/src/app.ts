@@ -9,11 +9,14 @@ import cardRoute from './routes/card.route.js'
 import devRoute from './routes/dev.route.js'
 
 export async function buildApp() {
-  const app = Fastify({ logger: true })
+  const app = Fastify({ logger: true, ajv: { customOptions: { keywords: ['example'] } } })
 
   app.setErrorHandler((error, _request, reply) => {
     if (error instanceof ZodError) {
       return reply.status(400).send({ error: 'Validation Error', issues: error.issues })
+    }
+    if ((error as any).validation) {
+      return reply.status(400).send({ error: 'Validation Error', message: error.message })
     }
     app.log.error(error)
     return reply.status(500).send({ error: 'Internal Server Error' })
