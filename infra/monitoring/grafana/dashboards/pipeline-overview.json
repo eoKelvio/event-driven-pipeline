@@ -9,10 +9,11 @@
       "id": 1,
       "title": "Webhook — Events Received (rate/s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "sum by (type) (rate(webhook_events_received_total[1m]))",
           "legendFormat": "{{type}}"
         }
@@ -22,10 +23,11 @@
       "id": 2,
       "title": "Webhook — RSA Decrypt Duration p99 (s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "histogram_quantile(0.99, sum by (le) (rate(webhook_decrypt_duration_seconds_bucket[1m])))",
           "legendFormat": "p99"
         }
@@ -35,10 +37,11 @@
       "id": 3,
       "title": "Storage — Events Stored (rate/s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "sum by (type) (rate(storage_events_stored_total[1m]))",
           "legendFormat": "{{type}}"
         }
@@ -48,10 +51,11 @@
       "id": 4,
       "title": "Storage — Upsert Duration p99 (s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "histogram_quantile(0.99, sum by (le, table) (rate(storage_upsert_duration_seconds_bucket[1m])))",
           "legendFormat": "{{table}}"
         }
@@ -61,10 +65,11 @@
       "id": 5,
       "title": "Streaming — MongoDB Upserts (rate/s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "sum by (type) (rate(streaming_upsert_total[1m]))",
           "legendFormat": "{{type}}"
         }
@@ -74,10 +79,11 @@
       "id": 6,
       "title": "Streaming — Consolidation Duration p99 (s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "histogram_quantile(0.99, sum by (le) (rate(streaming_consolidation_duration_seconds_bucket[1m])))",
           "legendFormat": "p99"
         }
@@ -87,10 +93,11 @@
       "id": 7,
       "title": "Node.js — Event Loop Lag (s)",
       "type": "timeseries",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
       "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 },
       "targets": [
         {
-          "datasource": "Prometheus",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
           "expr": "nodejs_eventloop_lag_seconds",
           "legendFormat": "{{job}} {{instance}}"
         }
