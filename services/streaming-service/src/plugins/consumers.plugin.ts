@@ -1,17 +1,15 @@
 import fp from 'fastify-plugin'
 import { FastifyInstance } from 'fastify'
-import { startPersonConsumer } from '../consumers/person.consumer.js'
-import { startAccountConsumer } from '../consumers/account.consumer.js'
-import { startCardConsumer } from '../consumers/card.consumer.js'
+import { startConsolidationConsumer } from '../consumers/consolidation.consumer.js'
 
 export default fp(async (fastify: FastifyInstance) => {
-  const consumers = await Promise.all([
-    startPersonConsumer(fastify.kafka),
-    startAccountConsumer(fastify.kafka),
-    startCardConsumer(fastify.kafka),
-  ])
+  let consumer: Awaited<ReturnType<typeof startConsolidationConsumer>> | null = null
+
+  fastify.addHook('onReady', async () => {
+    consumer = await startConsolidationConsumer(fastify.kafka.client, fastify.kafka.producer, fastify.pg, fastify.metrics)
+  })
 
   fastify.addHook('onClose', async () => {
-    await Promise.all(consumers.map((c) => c.disconnect()))
+    await consumer?.disconnect()
   })
 })
